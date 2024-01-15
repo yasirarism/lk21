@@ -70,7 +70,9 @@ class Bypass(BaseExtractor):
 
         raw = self.session.get(url)
         if (fileId := re.search(r"(?i)showFileInformation\((\d+)\)", raw.text)):
-            return self.bypass_redirect('https://letsupload.io/account/direct_download/' + fileId.group(1))
+            return self.bypass_redirect(
+                f'https://letsupload.io/account/direct_download/{fileId.group(1)}'
+            )
         if (nextUrl := re.search(r"window.location += ['\"]([^\"']+)", raw.text)):
             return nextUrl.group(1)
 
@@ -82,7 +84,7 @@ class Bypass(BaseExtractor):
         raw = self.session.get(url)
 
         if (videolink := re.findall(r"document.*((?=id\=)[^\"']+)", raw.text)):
-            nexturl = "https://streamtape.com/get_video?" + videolink[-1]
+            nexturl = f"https://streamtape.com/get_video?{videolink[-1]}"
             self.report_bypass(nexturl)
             if (redirect := self.bypass_redirect(nexturl)):
                 return redirect
@@ -190,8 +192,7 @@ class Bypass(BaseExtractor):
         if (dlbutton := re.search(r'href = "([^"]+)" \+ \(([^)]+)\) \+ "([^"]+)', raw.text)):
             folder, math_chall, filename = dlbutton.groups()
             math_chall = eval(math_chall)
-            return "%s%s%s%s" % (
-                re.search(r"https?://[^/]+", raw.url).group(0), folder, math_chall, filename)
+            return f'{re.search("https?://[^/]+", raw.url).group(0)}{folder}{math_chall}{filename}'
 
         soup = self.soup(raw)
         if (script := soup.find("script", text=re.compile("(?si)\s*var a = \d+;"))):
@@ -207,7 +208,7 @@ class Bypass(BaseExtractor):
                     a = math.floor(int(a) // 3)
                 divider = int(re.findall(f"(\d+)%b", sc)[0])
                 return re.search(r"(^https://www\d+.zippyshare.com)", raw.url).group(1) + \
-                    "".join([
+                        "".join([
                         file[0],
                         str(a + (divider % int(b))),
                         file[1]

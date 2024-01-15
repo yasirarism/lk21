@@ -11,11 +11,11 @@ def title(text, rtn=False):
 
 
 def removeprefix(s, p):
-    return re.sub(r"^%s" % p, "", s)
+    return re.sub(f"^{p}", "", s)
 
 
 def removesuffix(s, p):
-    return re.sub(r"%s$" % p, "", s)
+    return re.sub(f"{p}$", "", s)
 
 
 def _check_version():
@@ -98,10 +98,7 @@ class MetaSet(UserDict):
             self.add(key or id, value.group(1), split)
 
     def pop(self, key, default=None, force=False):
-        if not self.store.get(key):
-            return default
-        else:
-            return self.store.pop(key) or default
+        return default if not self.store.get(key) else self.store.pop(key) or default
 
 
 def parse_range(raw):
